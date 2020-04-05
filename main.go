@@ -4,8 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 
-	"github.com/ricardo_user_creation/api"
-	"github.com/ricardo_user_creation/entities"
+	"github.com/Bhaal22/ricardo_user_creation/api"
+	"github.com/Bhaal22/ricardo_user_creation/entities"
 )
 
 type server struct {

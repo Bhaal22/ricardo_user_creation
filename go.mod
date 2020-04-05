@@ -1,4 +1,4 @@
-module github.com/ricardo_user_creation
+module github.com/Bhaal22/ricardo_user_creation
 
 go 1.14
 

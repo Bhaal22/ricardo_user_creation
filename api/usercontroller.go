@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 
-	"github.com/ricardo_user_creation/entities"
-	"github.com/ricardo_user_creation/logic"
+	"github.com/Bhaal22/ricardo_user_creation/entities"
+	"github.com/Bhaal22/ricardo_user_creation/logic"
 )
 
 var route = "/user"
