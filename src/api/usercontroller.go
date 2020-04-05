@@ -1,70 +1,72 @@
 package api
 
 import (
-    "net/http"
-    "github.com/gin-gonic/gin"
-    "github.com/jinzhu/gorm"
+	"net/http"
 
-    "drylm.org/ricardo/user_creation/entities"
-    "drylm.org/ricardo/user_creation/logic"
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
+
+	"github.com/ricardo_user_creation/entities"
+	"github.com/ricardo_user_creation/logic"
 )
 
 var route = "/user"
 
 func SetupUserController(engine *gin.Engine) {
-    engine.GET(route, getUsers)
-    engine.GET(route + "/:id", getUser)
-    engine.POST(route, postUser)
-    engine.PATCH(route + "/:id", patchUser)
+	engine.GET(route, getUsers)
+	engine.GET(route+"/:id", getUser)
+	engine.POST(route, postUser)
+	engine.PATCH(route+"/:id", patchUser)
 }
 
 func getUsers(c *gin.Context) {
-    db := c.MustGet("db").(*gorm.DB)
+	db := c.MustGet("db").(*gorm.DB)
 
-    var users []entities.User
-    db.Find(&users)
+	var users []entities.User
+	db.Find(&users)
 
-    c.JSON(http.StatusOK, gin.H{"data": logic.ValidCountry(logic.Country(c.ClientIP()))})
+	country, _ := logic.Country(c.ClientIP())
+	c.JSON(http.StatusOK, gin.H{"data": logic.ValidCountry(country)})
 }
 
 func getUser(c *gin.Context) {
-    db := c.MustGet("db").(*gorm.DB)
+	db := c.MustGet("db").(*gorm.DB)
 
-    // Get model if exist
-    var user entities.User
-    if err := db.Where("id = ?", c.Param("id")).First(&user).Error; err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "User not found!"})
-        return
-    }
+	// Get model if exist
+	var user entities.User
+	if err := db.Where("id = ?", c.Param("id")).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User not found!"})
+		return
+	}
 
-    c.JSON(http.StatusOK, gin.H{"data": user})
+	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
 type CreateUserInput struct {
-    FirstName string `json:"first_name" binding:"required"`
-	Email  string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
-  }
+	FirstName string `json:"first_name" binding:"required"`
+	Email     string `json:"email" binding:"required"`
+	Password  string `json:"password" binding:"required"`
+}
 
 func postUser(c *gin.Context) {
-    db := c.MustGet("db").(*gorm.DB)
+	db := c.MustGet("db").(*gorm.DB)
 
-    // Validate input
-    var input CreateUserInput
-    if err := c.ShouldBindJSON(&input); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
+	// Validate input
+	var input CreateUserInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-    user := entities.User{FirstName: input.FirstName, Email: input.Email, Password: input.Password}
-    if err := db.Create(&user).Error; err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
+	user := entities.User{FirstName: input.FirstName, Email: input.Email, Password: input.Password}
+	if err := db.Create(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-    c.JSON(http.StatusOK, gin.H{"data": user})
+	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
 func patchUser(c *gin.Context) {
-    c.JSON(http.StatusOK, gin.H{})
+	c.JSON(http.StatusOK, gin.H{})
 }
