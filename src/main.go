@@ -13,7 +13,7 @@ type server struct {
 func main() {
     s := server{context: gin.Default()}
 
-    api.Setup(s.context)
+    api.SetupUserController(s.context)
 
     s.context.Run()
 }

@@ -1,7 +1,7 @@
-package user
+package entities
 
-type user struct {
-    firstName string
-	email  string
-	password string
+type User struct {
+    FirstName string
+	Email  string
+	Password string
 }
