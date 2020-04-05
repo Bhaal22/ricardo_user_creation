@@ -10,8 +10,9 @@ import (
 var route = "/user"
 
 func SetupUserController(engine *gin.Engine) {
-    engine.GET(route, getUser)
+    engine.GET(route + "/:id", getUser)
     engine.POST(route, postUser)
+    engine.PATCH(route + "/:id", patchUser)
 }
 
 func getUser(c *gin.Context) {
@@ -21,5 +22,9 @@ func getUser(c *gin.Context) {
 }
 
 func postUser(c *gin.Context) {
+    c.JSON(http.StatusOK, gin.H{})
+}
+
+func patchUser(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{})
 }
