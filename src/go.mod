@@ -1,4 +1,4 @@
-module drylm.org/ricardo/user_creation
+module github.com/ricardo_user_creation
 
 go 1.14
 
