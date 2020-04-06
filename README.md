@@ -20,3 +20,8 @@ curl -XPOST localhost:8080/user -H "Content-Type: application/json" --data '{"fi
 curl -XPATCH localhost:8080/user/1 -H "Content-Type: application/json" --data '{"first_name":"john2"}'
 curl "localhost:8080/user?first_name=j&email=plop"
 ```
+
+# Improvements:
+  * support search for multiple occurences of each attributes
+  * add details to events (clientIP, ...)
+  * how to spoof ip address to bypass check of Swiss
