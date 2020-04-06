@@ -17,4 +17,5 @@ ricardo_user_creation
 
 ```
 curl -XPOST localhost:8080/user -H "Content-Type: application/json" --data '{"first_name":"john", "email": "john@plop.io","password":"xyz"}'
+curl -XPATCH localhost:8080/user/1 -H "Content-Type: application/json" --data '{"first_name":"john2"}'
 ```
