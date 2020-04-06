@@ -53,6 +53,7 @@ func postUser(c *gin.Context) {
     rmq := c.MustGet("rmq").(*events.RMQ)
 
     event := &events.Event{Name: "CREATE_USER", Status: "UNKNOWN", Reason: ""}
+    defer rmq.Publish(event)
 
     var input CreateUserInput
     if err := c.ShouldBindJSON(&input); err != nil {
@@ -60,18 +61,15 @@ func postUser(c *gin.Context) {
         event.Status = "FAILED"
         event.Reason = err.Error()
 
-        defer rmq.Publish(event)
         return
     }
 
     user := entities.User{FirstName: input.FirstName, Email: input.Email, Password: input.Password}
     if err := db.Create(&user).Error; err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-
         event.Status = "FAILED"
         event.Reason = err.Error()
 
-        defer rmq.Publish(event)
         return
     }
 
@@ -79,9 +77,45 @@ func postUser(c *gin.Context) {
 
     event.Status = "SUCCESS"
     event.Reason = ""
-    defer rmq.Publish(event)
+}
+
+type UpdateUserInput struct {
+    FirstName string `json:"first_name"`
+    Email     string `json:"email"`
+    Password  string `json:"password"`
 }
 
 func patchUser(c *gin.Context) {
-    c.JSON(http.StatusOK, gin.H{})
+    db := c.MustGet("db").(*gorm.DB)
+    rmq := c.MustGet("rmq").(*events.RMQ)
+
+    event := &events.Event{Name: "UPDATE_USER", Status: "UNKNOWN", Reason: ""}
+    defer rmq.Publish(event)
+
+    var user entities.User
+    if err := db.Where("id = ?", c.Param("id")).First(&user).Error; err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
+
+        event.Status = "FAILED"
+        event.Reason = err.Error()
+        return
+    }
+
+  
+    var input UpdateUserInput
+    if err := c.ShouldBindJSON(&input); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+        event.Status = "FAILED"
+        event.Reason = err.Error()
+        return
+    }
+
+    db.Model(&user).Updates(input)
+
+
+    c.JSON(http.StatusOK, gin.H{"data": user})
+
+    event.Status = "SUCCESS"
+    event.Reason = ""
 }
