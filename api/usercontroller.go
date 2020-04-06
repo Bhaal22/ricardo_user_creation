@@ -1,7 +1,9 @@
 package api
 
 import (
+    "fmt"
     "net/http"
+    "net/url"
     "github.com/gin-gonic/gin"
     "github.com/jinzhu/gorm"
 
@@ -19,20 +21,46 @@ func SetupUserController(engine *gin.Engine) {
     engine.PATCH(route+"/:id", patchUser)
 }
 
+type FindUserInput struct {
+    FirstName string `json:"first_name" binding:"required"`
+    Email     string `json:"email" binding:"required"`
+    Password  string `json:"password" binding:"required"`
+}
+
+func buildFilterquery(params url.Values) string {
+    filter := ""
+    if params["first_name"] != nil {
+        first_name := params["first_name"][0]
+        filter = fmt.Sprintf("first_name like '%%%s%%'", first_name)
+    }
+
+    if params["email"] != nil {
+        if filter != "" {
+            filter = fmt.Sprintf("%s AND ", filter)
+        }
+        email := params["email"][0]
+        filter = fmt.Sprintf("%s email like '%%%s%%'", filter, email)
+    }
+    fmt.Printf("%s \n", filter)
+
+    return filter
+}
+
 func getUsers(c *gin.Context) {
     db := c.MustGet("db").(*gorm.DB)
 
-    var users []entities.User
-    db.Find(&users)
 
-    country, _ := logic.Country(c.ClientIP())
-    c.JSON(http.StatusOK, gin.H{"data": logic.ValidCountry(country)})
+    filter := buildFilterquery(c.Request.URL.Query())
+
+    var users []entities.User
+    db.Where(filter).Find(&users)
+
+    c.JSON(http.StatusOK, gin.H{"data": users})
 }
 
 func getUser(c *gin.Context) {
     db := c.MustGet("db").(*gorm.DB)
 
-    // Get model if exist
     var user entities.User
     if err := db.Where("id = ?", c.Param("id")).First(&user).Error; err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "User not found!"})
@@ -54,6 +82,18 @@ func postUser(c *gin.Context) {
 
     event := &events.Event{Name: "CREATE_USER", Status: "UNKNOWN", Reason: ""}
     defer rmq.Publish(event)
+
+    country, _ := logic.Country(c.ClientIP())
+    validRegistrationCountry := logic.ValidCountry(country)
+
+    if !validRegistrationCountry {
+        event.Status = "FAILED"
+        event.Reason = fmt.Sprintf("ip: %s located in %s. Not allowed.", c.ClientIP(), country)
+
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Not allowed to create account. Not located in Switzerland"})
+        return
+    }
+
 
     var input CreateUserInput
     if err := c.ShouldBindJSON(&input); err != nil {

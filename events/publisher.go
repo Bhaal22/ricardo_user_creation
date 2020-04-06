@@ -6,7 +6,6 @@ import (
 )
 
 
-
 type RMQ struct {
     ConnectionString string
 }
