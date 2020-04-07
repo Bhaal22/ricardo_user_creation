@@ -47,6 +47,7 @@ func (r *RMQ) Publish(event *Event) error {
         false,  // mandatory
         false,  // immediate
         amqp.Publishing {
+            DeliveryMode: amqp.Persistent,
             ContentType: "text/plain",
             Body:        []byte(event.ToJson()),
         })

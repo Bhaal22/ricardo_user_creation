@@ -16,7 +16,7 @@ type server struct {
 }
 
 func main() {
-    s := server{engine: gin.Default(), db: entities.Setup(), rmq: &events.RMQ{ConnectionString: "amqp://guest:guest@172.17.0.2:5672/"}}
+    s := server{engine: gin.Default(), db: entities.Setup(), rmq: &events.RMQ{ConnectionString: "amqp://guest:guest@rmq:5672/"}}
 
     s.engine.Use(func(c *gin.Context) {
         c.Set("db", s.db)

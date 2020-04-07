@@ -1,0 +1,28 @@
+version: '3.7'
+services:
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    links:
+      - rmq
+      - pgsql  
+  rmq:
+    ports:
+      - "15672:15672"
+    image: rabbitmq:3-management
+    volumes:
+      - rmq-data:/var/lib/rabbitmq
+  pgsql:
+    image: postgres:alpine
+    volumes:
+      - pg-data:/var/lib/postgresql/data/pgdata
+    environment:
+      - POSTGRES_PASSWORD=ricardo
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=ricardo
+      - PGDATA=/var/lib/postgresql/data/pgdata
+volumes:
+  pg-data:
+  rmq-data:
+  

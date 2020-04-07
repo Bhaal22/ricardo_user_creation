@@ -19,6 +19,8 @@ ricardo_user_creation
 curl -XPOST localhost:8080/user -H "Content-Type: application/json" --data '{"first_name":"john", "email": "john@plop.io","password":"xyz"}'
 curl -XPATCH localhost:8080/user/1 -H "Content-Type: application/json" --data '{"first_name":"john2"}'
 curl "localhost:8080/user?first_name=j&email=plop"
+
+Swiss IP: curl -XPOST localhost:8080/user -H "Content-Type: application/json" -H "X-Forwarded-For: 178.209.55.112" --data '{"first_name":"john", "email": "john@plop.io","password":"xyz"}'
 ```
 
 ```
