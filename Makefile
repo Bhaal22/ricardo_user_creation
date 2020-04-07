@@ -12,3 +12,6 @@ build-docker:
 
 run-docker:
 	docker run --rm -it ricardo:v0.1
+
+run:
+	docker-compose up -d
