@@ -1,5 +1,11 @@
-deps:
-	GO111MODULE=on go get github.com/golang/mock/mockgen@latest
+build:
+	go build .
+
+run:
+	go run main.go
+
+tests:
+	go test ./...
 
 build-docker:
 	docker build -t ricardo:v0.1 .
