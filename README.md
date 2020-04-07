@@ -28,6 +28,11 @@ https://hub.docker.com/repository/docker/drylm/ricardo
 docker run --rm -it drylm/ricardo:v0.1
 ```
 
+```
+docker-compose up -d
+Admin console: http://container-ip:15672
+```
+
 # RMQ
 
 ```
@@ -39,7 +44,7 @@ Admin console: http://container-ip:15672
 # Improvements:
   * support search for multiple occurences of each attributes
   * add details to events (clientIP, ...)
-  * how to spoof ip address to bypass check of Swiss
-  * docker files + docker compose
+  * ~~how to spoof ip address to bypass check of Swiss~~ (**X-Forwarded-For**)
+  * ~~docker files + docker compose~~
   * inject RMQ endpoint via environment variables
-  * usage of pgsql instead of sqlite3
+  * ~~usage of pgsql instead of sqlite3~~
